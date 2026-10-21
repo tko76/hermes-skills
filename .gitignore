@@ -1,0 +1,15 @@
+# Credentials and secrets — never commit
+.env
+.env.*
+!.env.EXAMPLE
+auth.json
+*.pem
+*.key
+
+# Hermes runtime state
+state.db*
+memories/
+sessions/
+logs/
+cache/
+.DS_Store

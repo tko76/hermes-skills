@@ -13,16 +13,29 @@
 set -eu
 
 REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+SKILLS_DIR="$HERMES_HOME/skills"
 
 install_skill() {
     name="$1"
     src="$REPO_ROOT/skills/$name/SKILL.md"
+    dest_dir="$SKILLS_DIR/$name"
+    dest="$dest_dir/SKILL.md"
+
     if [ ! -f "$src" ]; then
         printf 'Not found: %s\n' "$src" >&2
         exit 1
     fi
-    printf 'Installing %s ...\n' "$name"
-    hermes skills install "$src" --yes
+
+    mkdir -p "$dest_dir"
+
+    if [ -f "$dest" ] && cmp -s "$src" "$dest"; then
+        printf 'Unchanged: %s\n' "$name"
+        return 0
+    fi
+
+    cp -p "$src" "$dest"
+    printf 'Installed: %s -> %s\n' "$name" "$dest"
 }
 
 if [ "$#" -eq 0 ]; then
@@ -43,6 +56,5 @@ else
     done
 fi
 
-printf '\nAll requested skills installed.\n'
-printf 'The skills load automatically in every new Hermes session.\n'
-printf 'Restart any currently-open Hermes chat with /new for them to take effect.\n'
+printf '\nDone. Skills load automatically in every new Hermes session.\n'
+printf 'If Hermes is open, run /new to pick them up.\n'
